@@ -1,0 +1,570 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion des étudiants</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#4F46E5',
+                        secondary: '#10B981',
+                        danger: '#EF4444',
+                        warning: '#F59E0B'
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Animation pour les entrées de formulaire */
+        .form-input {
+            transition: all 0.3s ease;
+        }
+        .form-input:focus {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        
+        /* Animation pour les boutons */
+        .btn-animate {
+            transition: all 0.2s ease;
+        }
+        .btn-animate:hover {
+            transform: translateY(-2px);
+        }
+        .btn-animate:active {
+            transform: translateY(0);
+        }
+        
+        /* Animation pour les cartes d'étudiants */
+        .student-card {
+            transition: all 0.3s ease;
+        }
+        .student-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+    </style>
+</head>
+<body class="bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8">
+        <header class="mb-10">
+            <h1 class="text-3xl md:text-4xl font-bold text-center text-primary mb-2">Gestion des Étudiants</h1>
+            <p class="text-gray-600 text-center max-w-2xl mx-auto">Système moderne d'enregistrement et de suivi des présences étudiantes</p>
+        </header>
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+            <!-- Formulaire d'enregistrement -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-2">Enregistrer un étudiant</h2>
+                <form id="studentForm" class="space-y-4">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="lastName" class="block text-sm font-medium text-gray-700 mb-1">Nom*</label>
+                            <input type="text" id="lastName" required class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                        </div>
+                        <div>
+                            <label for="firstName" class="block text-sm font-medium text-gray-700 mb-1">Prénom*</label>
+                            <input type="text" id="firstName" required class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="matricule" class="block text-sm font-medium text-gray-700 mb-1">Numéro de matricule*</label>
+                        <input type="text" id="matricule" required class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                    </div>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label for="department" class="block text-sm font-medium text-gray-700 mb-1">Département*</label>
+                            <select id="department" required class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                <option value="" disabled selected>Sélectionnez</option>
+                                <option value="Informatique">Informatique</option>
+                                <option value="Mathématiques">Mathématiques</option>
+                                <option value="Physique">Physique</option>
+                                <option value="Chimie">Chimie</option>
+                                <option value="Biologie">Biologie</option>
+                                <option value="Économie">Économie</option>
+                                <option value="Droit">Droit</option>
+                                <option value="Lettres">Lettres</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label for="level" class="block text-sm font-medium text-gray-700 mb-1">Niveau*</label>
+                            <select id="level" required class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                                <option value="" disabled selected>Sélectionnez</option>
+                                <option value="L1">Licence 1</option>
+                                <option value="L2">Licence 2</option>
+                                <option value="L3">Licence 3</option>
+                                <option value="M1">Master 1</option>
+                                <option value="M2">Master 2</option>
+                                <option value="D">Doctorat</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label for="field" class="block text-sm font-medium text-gray-700 mb-1">Filière</label>
+                        <input type="text" id="field" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                    </div>
+                    
+                    <div class="pt-2">
+                        <button type="submit" class="btn-animate w-full bg-primary hover:bg-primary-dark text-white py-3 px-4 rounded-lg font-medium transition duration-300 flex items-center justify-center">
+                            <i class="fas fa-user-plus mr-2"></i> Enregistrer l'étudiant
+                        </button>
+                    </div>
+                </form>
+            </div>
+            
+            <!-- Statistiques -->
+            <div class="bg-white rounded-xl shadow-md p-6">
+                <h2 class="text-xl font-semibold text-gray-800 mb-6 border-b pb-2">Statistiques</h2>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
+                    <div class="bg-blue-50 p-4 rounded-lg border-l-4 border-primary">
+                        <p class="text-sm text-gray-600">Total étudiants</p>
+                        <p id="totalStudents" class="text-2xl font-bold text-primary">0</p>
+                    </div>
+                    <div class="bg-green-50 p-4 rounded-lg border-l-4 border-secondary">
+                        <p class="text-sm text-gray-600">Présents aujourd'hui</p>
+                        <p id="presentStudents" class="text-2xl font-bold text-secondary">0</p>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="bg-red-50 p-4 rounded-lg border-l-4 border-danger">
+                        <p class="text-sm text-gray-600">Absents aujourd'hui</p>
+                        <p id="absentStudents" class="text-2xl font-bold text-danger">0</p>
+                    </div>
+                    <div class="bg-yellow-50 p-4 rounded-lg border-l-4 border-warning">
+                        <p class="text-sm text-gray-600">Heures d'absence moy.</p>
+                        <p id="avgAbsence" class="text-2xl font-bold text-warning">0h</p>
+                    </div>
+                </div>
+                
+                <div class="mt-6">
+                    <h3 class="text-md font-medium text-gray-700 mb-3">Tri par département</h3>
+                    <div id="departmentDistribution" class="space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-sm font-medium text-gray-700">Chargement...</span>
+                            <span class="text-sm text-gray-500">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Liste des étudiants -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6">
+                <h2 class="text-xl font-semibold text-gray-800 border-b pb-2">Liste des étudiants</h2>
+                <div class="flex items-center space-x-2 mt-4 sm:mt-0">
+                    <div class="relative">
+                        <input type="text" id="searchInput" placeholder="Rechercher..." class="form-input pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary w-full sm:w-64">
+                        <i class="fas fa-search absolute left-3 top-3 text-gray-400"></i>
+                    </div>
+                    <select id="filterDepartment" class="form-input px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+                        <option value="">Tous départements</option>
+                        <option value="Informatique">Informatique</option>
+                        <option value="Mathématiques">Mathématiques</option>
+                        <option value="Physique">Physique</option>
+                        <option value="Chimie">Chimie</option>
+                        <option value="Biologie">Biologie</option>
+                        <option value="Économie">Économie</option>
+                        <option value="Droit">Droit</option>
+                        <option value="Lettres">Lettres</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="overflow-x-auto">
+                <table class="min-w-full divide-y divide-gray-200">
+                    <thead class="bg-gray-50">
+                        <tr>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Matricule</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Nom & Prénom</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Département</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Niveau</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Filière</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Heures d'absence</th>
+                            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="studentTableBody" class="bg-white divide-y divide-gray-200">
+                        <tr>
+                            <td colspan="8" class="px-6 py-4 text-center text-gray-500">Aucun étudiant enregistré</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <div id="pagination" class="mt-4 flex justify-between items-center">
+                <div class="text-sm text-gray-500">
+                    Affichage de <span id="startItem">0</span> à <span id="endItem">0</span> sur <span id="totalItems">0</span> étudiants
+                </div>
+                <div class="flex space-x-1">
+                    <button id="prevPage" class="btn-animate px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 disabled:opacity-50">
+                        <i class="fas fa-chevron-left"></i>
+                    </button>
+                    <button id="nextPage" class="btn-animate px-3 py-1 rounded border border-gray-300 bg-white text-gray-700 disabled:opacity-50">
+                        <i class="fas fa-chevron-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour modifier les heures d'absence -->
+    <div id="absenceModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-lg shadow-xl p-6 w-full max-w-md">
+            <div class="flex justify-between items-center mb-4">
+                <h3 class="text-lg font-semibold text-gray-800">Modifier les heures d'absence</h3>
+                <button id="closeModal" class="text-gray-500 hover:text-gray-700">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="mb-4">
+                <label for="absenceHours" class="block text-sm font-medium text-gray-700 mb-1">Heures d'absence</label>
+                <input type="number" id="absenceHours" min="0" class="form-input w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary">
+            </div>
+            <div class="flex justify-end space-x-3">
+                <button id="cancelAbsence" class="btn-animate px-4 py-2 border border-gray-300 rounded-lg bg-white text-gray-700">
+                    Annuler
+                </button>
+                <button id="saveAbsence" class="btn-animate px-4 py-2 rounded-lg bg-primary text-white">
+                    Enregistrer
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Données des étudiants
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+        let currentPage = 1;
+        const studentsPerPage = 5;
+        let currentEditingId = null;
+
+        // Éléments du DOM
+        const studentForm = document.getElementById('studentForm');
+        const studentTableBody = document.getElementById('studentTableBody');
+        const searchInput = document.getElementById('searchInput');
+        const filterDepartment = document.getElementById('filterDepartment');
+        const prevPageBtn = document.getElementById('prevPage');
+        const nextPageBtn = document.getElementById('nextPage');
+        const startItemSpan = document.getElementById('startItem');
+        const endItemSpan = document.getElementById('endItem');
+        const totalItemsSpan = document.getElementById('totalItems');
+
+        // Statistiques
+        const totalStudentsSpan = document.getElementById('totalStudents');
+        const presentStudentsSpan = document.getElementById('presentStudents');
+        const absentStudentsSpan = document.getElementById('absentStudents');
+        const avgAbsenceSpan = document.getElementById('avgAbsence');
+        const departmentDistributionDiv = document.getElementById('departmentDistribution');
+
+        // Modal
+        const absenceModal = document.getElementById('absenceModal');
+        const closeModalBtn = document.getElementById('closeModal');
+        const cancelAbsenceBtn = document.getElementById('cancelAbsence');
+        const saveAbsenceBtn = document.getElementById('saveAbsence');
+
+        // Enregistrer un nouvel étudiant
+        studentForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const lastName = document.getElementById('lastName').value;
+            const firstName = document.getElementById('firstName').value;
+            const matricule = document.getElementById('matricule').value;
+            const department = document.getElementById('department').value;
+            const level = document.getElementById('level').value;
+            const field = document.getElementById('field').value;
+            
+            const student = {
+                id: Date.now().toString(),
+                matricule,
+                lastName,
+                firstName,
+                department,
+                level,
+                field,
+                status: 'present', // Par défaut présent
+                absenceHours: 0,
+                createdAt: new Date().toISOString()
+            };
+            
+            students.unshift(student); // Ajoute au début du tableau
+            saveStudents();
+            renderStudents();
+            updateStats();
+            
+            // Réinitialise le formulaire
+            studentForm.reset();
+            
+            // Animation de succès
+            const submitBtn = document.querySelector('#studentForm button[type="submit"]');
+            submitBtn.innerHTML = '<i class="fas fa-check mr-2"></i> Étudiant enregistré !';
+            submitBtn.classList.remove('bg-primary');
+            submitBtn.classList.add('bg-secondary');
+            
+            setTimeout(() => {
+                submitBtn.innerHTML = '<i class="fas fa-user-plus mr-2"></i> Enregistrer l\'étudiant';
+                submitBtn.classList.remove('bg-secondary');
+                submitBtn.classList.add('bg-primary');
+            }, 2000);
+        });
+
+        // Sauvegarder les étudiants dans localStorage
+        function saveStudents() {
+            localStorage.setItem('students', JSON.stringify(students));
+        }
+
+        // Afficher les étudiants dans le tableau
+        function renderStudents(filteredStudents = null) {
+            const displayStudents = filteredStudents || students;
+            const paginatedStudents = paginateStudents(displayStudents);
+            
+            if (paginatedStudents.length === 0) {
+                studentTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="px-6 py-4 text-center text-gray-500">
+                            ${
+                                displayStudents.length === 0 
+                                ? 'Aucun étudiant enregistré' 
+                                : 'Aucun étudiant ne correspond à votre recherche'
+                            }
+                        </td>
+                    </tr>
+                `;
+            } else {
+                studentTableBody.innerHTML = paginatedStudents.map(student => `
+                    <tr class="student-card hover:bg-gray-50">
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">${student.matricule}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${student.lastName} ${student.firstName}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.department}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.level}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${student.field || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full 
+                                ${student.status === 'present' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                                ${student.status === 'present' ? 'Présent' : 'Absent'}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                            ${student.status === 'absent' ? student.absenceHours + 'h' : '-'}
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <div class="flex space-x-2">
+                                <button onclick="toggleStatus('${student.id}')" class="btn-animate text-primary hover:text-primary-dark">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                                <button onclick="openAbsenceModal('${student.id}')" class="btn-animate text-warning hover:text-warning-dark">
+                                    <i class="fas fa-clock"></i>
+                                </button>
+                                <button onclick="deleteStudent('${student.id}')" class="btn-animate text-danger hover:text-danger-dark">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            // Mise à jour de la pagination
+            updatePagination(displayStudents.length);
+        }
+
+        // Pagination
+        function paginateStudents(students) {
+            const start = (currentPage - 1) * studentsPerPage;
+            const end = start + studentsPerPage;
+            return students.slice(start, end);
+        }
+
+        function updatePagination(total) {
+            const start = (currentPage - 1) * studentsPerPage + 1;
+            const end = Math.min(currentPage * studentsPerPage, total);
+            
+            startItemSpan.textContent = start;
+            endItemSpan.textContent = end;
+            totalItemsSpan.textContent = total;
+            
+            prevPageBtn.disabled = currentPage === 1;
+            nextPageBtn.disabled = currentPage * studentsPerPage >= total;
+        }
+
+        prevPageBtn.addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderStudents(getFilteredStudents());
+            }
+        });
+
+        nextPageBtn.addEventListener('click', () => {
+            const filteredStudents = getFilteredStudents();
+            if (currentPage * studentsPerPage < filteredStudents.length) {
+                currentPage++;
+                renderStudents(filteredStudents);
+            }
+        });
+
+        // Filtrer et rechercher les étudiants
+        function getFilteredStudents() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const departmentFilter = filterDepartment.value;
+            
+            return students.filter(student => {
+                const matchesSearch = 
+                    student.lastName.toLowerCase().includes(searchTerm) ||
+                    student.firstName.toLowerCase().includes(searchTerm) ||
+                    student.matricule.toLowerCase().includes(searchTerm);
+                
+                const matchesDepartment = departmentFilter ? student.department === departmentFilter : true;
+                
+                return matchesSearch && matchesDepartment;
+            });
+        }
+
+        searchInput.addEventListener('input', () => {
+            currentPage = 1;
+            renderStudents(getFilteredStudents());
+        });
+
+        filterDepartment.addEventListener('change', () => {
+            currentPage = 1;
+            renderStudents(getFilteredStudents());
+        });
+
+        // Gestion du statut (présent/absent)
+        function toggleStatus(id) {
+            const studentIndex = students.findIndex(s => s.id === id);
+            if (studentIndex !== -1) {
+                students[studentIndex].status = students[studentIndex].status === 'present' ? 'absent' : 'present';
+                if (students[studentIndex].status === 'present') {
+                    students[studentIndex].absenceHours = 0;
+                }
+                saveStudents();
+                renderStudents(getFilteredStudents());
+                updateStats();
+            }
+        }
+
+        // Gestion des heures d'absence
+        function openAbsenceModal(id) {
+            const student = students.find(s => s.id === id);
+            if (student) {
+                if (student.status === 'absent') {
+                    currentEditingId = id;
+                    document.getElementById('absenceHours').value = student.absenceHours;
+                    absenceModal.classList.remove('hidden');
+                } else {
+                    alert("L'étudiant doit être marqué comme absent avant de définir les heures d'absence.");
+                }
+            }
+        }
+
+        function closeAbsenceModal() {
+            absenceModal.classList.add('hidden');
+            currentEditingId = null;
+        }
+
+        closeModalBtn.addEventListener('click', closeAbsenceModal);
+        cancelAbsenceBtn.addEventListener('click', closeAbsenceModal);
+
+        saveAbsenceBtn.addEventListener('click', () => {
+            const hours = parseInt(document.getElementById('absenceHours').value);
+            
+            if (isNaN(hours) || hours < 0) {
+                alert("Veuillez entrer un nombre valide d'heures d'absence.");
+                return;
+            }
+            
+            const studentIndex = students.findIndex(s => s.id === currentEditingId);
+            if (studentIndex !== -1) {
+                students[studentIndex].absenceHours = hours;
+                saveStudents();
+                renderStudents(getFilteredStudents());
+                updateStats();
+                closeAbsenceModal();
+            }
+        });
+
+        // Supprimer un étudiant
+        function deleteStudent(id) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer cet étudiant ?")) {
+                students = students.filter(student => student.id !== id);
+                saveStudents();
+                
+                // Si on supprime le dernier étudiant de la page, revenir à la page précédente
+                const filteredStudents = getFilteredStudents();
+                const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+                if (currentPage > totalPages && totalPages > 0) {
+                    currentPage = totalPages;
+                }
+                
+                renderStudents(filteredStudents);
+                updateStats();
+            }
+        }
+
+        // Mettre à jour les statistiques
+        function updateStats() {
+            totalStudentsSpan.textContent = students.length;
+            
+            const presentCount = students.filter(s => s.status === 'present').length;
+            presentStudentsSpan.textContent = presentCount;
+            
+            const absentCount = students.filter(s => s.status === 'absent').length;
+            absentStudentsSpan.textContent = absentCount;
+            
+            const absentStudents = students.filter(s => s.status === 'absent');
+            const totalAbsenceHours = absentStudents.reduce((sum, student) => sum + student.absenceHours, 0);
+            const avgHours = absentCount > 0 ? (totalAbsenceHours / absentCount).toFixed(1) : 0;
+            avgAbsenceSpan.textContent = `${avgHours}h`;
+            
+            // Distribution par département
+            const departments = [...new Set(students.map(s => s.department))];
+            const departmentStats = {};
+            
+            departments.forEach(dept => {
+                departmentStats[dept] = students.filter(s => s.department === dept).length;
+            });
+            
+            // Trier par nombre d'étudiants
+            const sortedDepartments = Object.entries(departmentStats)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5); // Limiter à 5 départements pour la lisibilité
+            
+            departmentDistributionDiv.innerHTML = sortedDepartments.map(([dept, count]) => `
+                <div class="flex items-center justify-between">
+                    <span class="text-sm font-medium text-gray-700 truncate">${dept}</span>
+                    <span class="text-sm text-gray-500">${count}</span>
+                </div>
+            `).join('');
+            
+            // Ajouter un élément "Autres" si nécessaire
+            const otherCount = students.length - sortedDepartments.reduce((sum, [_, count]) => sum + count, 0);
+            if (otherCount > 0) {
+                departmentDistributionDiv.innerHTML += `
+                    <div class="flex items-center justify-between">
+                        <span class="text-sm font-medium text-gray-700">Autres</span>
+                        <span class="text-sm text-gray-500">${otherCount}</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudents();
+            updateStats();
+        });
+    </script>
+</body>
+</html>

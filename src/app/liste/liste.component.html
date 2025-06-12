@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liste des étudiants</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #4F46E5;
+            --secondary: #10B981;
+            --danger: #EF4444;
+            --warning: #F59E0B;
+        }
+        
+        .bg-primary {
+            background-color: var(--primary) !important;
+        }
+        
+        .bg-secondary {
+            background-color: var(--secondary) !important;
+        }
+        
+        .bg-danger {
+            background-color: var(--danger) !important;
+        }
+        
+        .bg-warning {
+            background-color: var(--warning) !important;
+        }
+        
+        .text-primary {
+            color: var(--primary) !important;
+        }
+        
+        .text-secondary {
+            color: var(--secondary) !important;
+        }
+        
+        .text-danger {
+            color: var(--danger) !important;
+        }
+        
+        .text-warning {
+            color: var(--warning) !important;
+        }
+        
+        .border-primary {
+            border-color: var(--primary) !important;
+        }
+        
+        .border-secondary {
+            border-color: var(--secondary) !important;
+        }
+        
+        .border-danger {
+            border-color: var(--danger) !important;
+        }
+        
+        .border-warning {
+            border-color: var(--warning) !important;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+        
+        .btn-primary:hover {
+            background-color: #4338CA;
+            border-color: #4338CA;
+        }
+        
+        .student-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .student-card {
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card {
+            border-left: 4px solid;
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        .table-responsive {
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">Liste des Étudiants</h1>
+        </header>
+            
+        <!-- Liste des étudiants -->
+        <div class="card">
+            <div class="card-body">
+                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
+                    <h2 class="h4 card-title mb-3 mb-md-0">Liste des étudiants</h2>
+                </div>
+                
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Matricule</th>
+                                <th>Nom & Prénom</th>
+                                <th>Département</th>
+                                <th>Niveau</th>
+                                <th>Filière</th>
+                                <th>Statut</th>
+                                <th>Heures d'absence</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="studentTableBody">
+                            <tr>
+                                <td colspan="8" class="text-center py-4 text-muted">Chargement des données...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                
+                <div id="pagination" class="d-flex justify-content-between align-items-center mt-3">
+                    <div class="text-muted small">
+                        Affichage de <span id="startItem">0</span> à <span id="endItem">0</span> sur <span id="totalItems">0</span> étudiants
+                    </div>
+                    <div class="btn-group">
+                        <button id="prevPage" class="btn btn-outline-primary btn-sm" disabled>
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button id="nextPage" class="btn btn-outline-primary btn-sm" disabled>
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pour modifier les heures d'absence -->
+    <div class="modal fade" id="absenceModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Modifier les heures d'absence</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label for="absenceHours" class="form-label">Heures d'absence</label>
+                        <input type="number" class="form-control" id="absenceHours" min="0">
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <button type="button" id="saveAbsence" class="btn btn-primary">Enregistrer</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Données des étudiants
+        let students = JSON.parse(localStorage.getItem('students')) || [];
+        let currentPage = 1;
+        const studentsPerPage = 5;
+        let currentEditingId = null;
+        const absenceModal = new bootstrap.Modal(document.getElementById('absenceModal'));
+
+        // Afficher les étudiants dans le tableau
+        function renderStudents(filteredStudents = null) {
+            const displayStudents = filteredStudents || students;
+            const paginatedStudents = paginateStudents(displayStudents);
+            const tbody = document.getElementById('studentTableBody');
+            
+            if (paginatedStudents.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="8" class="text-center py-4 text-muted">
+                            ${displayStudents.length === 0 ? 'Aucun étudiant enregistré' : 'Aucun étudiant ne correspond à votre recherche'}
+                        </td>
+                    </tr>
+                `;
+            } else {
+                tbody.innerHTML = paginatedStudents.map(student => `
+                    <tr class="student-card">
+                        <td>${student.matricule}</td>
+                        <td>${student.lastName} ${student.firstName}</td>
+                        <td>${student.department}</td>
+                        <td>${student.level}</td>
+                        <td>${student.field || '-'}</td>
+                        <td>
+                            <span class="badge ${student.status === 'present' ? 'bg-success' : 'bg-danger'}">
+                                ${student.status === 'present' ? 'Présent' : 'Absent'}
+                            </span>
+                        </td>
+                        <td>${student.status === 'absent' ? student.absenceHours + 'h' : '-'}</td>
+                        <td>
+                            <div class="d-flex gap-2">
+                                <button onclick="toggleStatus('${student.id}')" class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-exchange-alt"></i>
+                                </button>
+                                <button onclick="openAbsenceModal('${student.id}')" class="btn btn-sm btn-outline-warning">
+                                    <i class="fas fa-clock"></i>
+                                </button>
+                                <button onclick="deleteStudent('${student.id}')" class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                `).join('');
+            }
+            
+            updatePagination(displayStudents.length);
+        }
+
+        // Pagination
+        function paginateStudents(students) {
+            const start = (currentPage - 1) * studentsPerPage;
+            const end = start + studentsPerPage;
+            return students.slice(start, end);
+        }
+
+        function updatePagination(total) {
+            const start = (currentPage - 1) * studentsPerPage + 1;
+            const end = Math.min(currentPage * studentsPerPage, total);
+            
+            document.getElementById('startItem').textContent = start;
+            document.getElementById('endItem').textContent = end;
+            document.getElementById('totalItems').textContent = total;
+            
+            document.getElementById('prevPage').disabled = currentPage === 1;
+            document.getElementById('nextPage').disabled = currentPage * studentsPerPage >= total;
+        }
+
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                currentPage--;
+                renderStudents(getFilteredStudents());
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            const filteredStudents = getFilteredStudents();
+            if (currentPage * studentsPerPage < filteredStudents.length) {
+                currentPage++;
+                renderStudents(filteredStudents);
+            }
+        });
+
+        // Filtrer et rechercher les étudiants
+        function getFilteredStudents() {
+            const searchTerm = document.getElementById('searchInput').value.toLowerCase();
+            const departmentFilter = document.getElementById('filterDepartment').value;
+            const statusFilter = document.getElementById('filterStatus').value;
+            
+            return students.filter(student => {
+                const matchesSearch = 
+                    student.lastName.toLowerCase().includes(searchTerm) ||
+                    student.firstName.toLowerCase().includes(searchTerm) ||
+                    student.matricule.toLowerCase().includes(searchTerm);
+                
+                const matchesDepartment = departmentFilter ? student.department === departmentFilter : true;
+                const matchesStatus = statusFilter ? student.status === statusFilter : true;
+                
+                return matchesSearch && matchesDepartment && matchesStatus;
+            });
+        }
+
+        document.getElementById('searchInput').addEventListener('input', () => {
+            currentPage = 1;
+            renderStudents(getFilteredStudents());
+        });
+
+        document.getElementById('filterDepartment').addEventListener('change', () => {
+            currentPage = 1;
+            renderStudents(getFilteredStudents());
+        });
+
+        document.getElementById('filterStatus').addEventListener('change', () => {
+            currentPage = 1;
+            renderStudents(getFilteredStudents());
+        });
+
+        // Gestion du statut (présent/absent)
+        function toggleStatus(id) {
+            const studentIndex = students.findIndex(s => s.id === id);
+            if (studentIndex !== -1) {
+                students[studentIndex].status = students[studentIndex].status === 'present' ? 'absent' : 'present';
+                if (students[studentIndex].status === 'present') {
+                    students[studentIndex].absenceHours = 0;
+                }
+                localStorage.setItem('students', JSON.stringify(students));
+                renderStudents(getFilteredStudents());
+                updateStats();
+            }
+        }
+
+        // Gestion des heures d'absence
+        function openAbsenceModal(id) {
+            const student = students.find(s => s.id === id);
+            if (student) {
+                if (student.status === 'absent') {
+                    currentEditingId = id;
+                    document.getElementById('absenceHours').value = student.absenceHours;
+                    absenceModal.show();
+                } else {
+                    alert("L'étudiant doit être marqué comme absent avant de définir les heures d'absence.");
+                }
+            }
+        }
+
+        document.getElementById('saveAbsence').addEventListener('click', () => {
+            const hours = parseInt(document.getElementById('absenceHours').value);
+            
+            if (isNaN(hours) || hours < 0) {
+                alert("Veuillez entrer un nombre valide d'heures d'absence.");
+                return;
+            }
+            
+            const studentIndex = students.findIndex(s => s.id === currentEditingId);
+            if (studentIndex !== -1) {
+                students[studentIndex].absenceHours = hours;
+                localStorage.setItem('students', JSON.stringify(students));
+                renderStudents(getFilteredStudents());
+                updateStats();
+                absenceModal.hide();
+            }
+        });
+
+        // Supprimer un étudiant
+        function deleteStudent(id) {
+            if (confirm("Êtes-vous sûr de vouloir supprimer cet étudiant ?")) {
+                students = students.filter(student => student.id !== id);
+                localStorage.setItem('students', JSON.stringify(students));
+                
+                const filteredStudents = getFilteredStudents();
+                const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
+                if (currentPage > totalPages && totalPages > 0) {
+                    currentPage = totalPages;
+                }
+                
+                renderStudents(filteredStudents);
+                updateStats();
+            }
+        }
+
+        // Mettre à jour les statistiques
+        function updateStats() {
+            document.getElementById('totalStudents').textContent = students.length;
+            
+            const presentCount = students.filter(s => s.status === 'present').length;
+            document.getElementById('presentStudents').textContent = presentCount;
+            
+            const absentCount = students.filter(s => s.status === 'absent').length;
+            document.getElementById('absentStudents').textContent = absentCount;
+            
+            const absentStudents = students.filter(s => s.status === 'absent');
+            const totalAbsenceHours = absentStudents.reduce((sum, student) => sum + student.absenceHours, 0);
+            const avgHours = absentCount > 0 ? (totalAbsenceHours / absentCount).toFixed(1) : 0;
+            document.getElementById('avgAbsence').textContent = `${avgHours}h`;
+            
+            // Distribution par département
+            const departments = [...new Set(students.map(s => s.department))];
+            const departmentStats = {};
+            
+            departments.forEach(dept => {
+                departmentStats[dept] = students.filter(s => s.department === dept).length;
+            });
+            
+            const sortedDepartments = Object.entries(departmentStats)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5);
+            
+            const distributionDiv = document.getElementById('departmentDistribution');
+            distributionDiv.innerHTML = sortedDepartments.map(([dept, count]) => `
+                <div class="list-group-item d-flex justify-content-between align-items-center">
+                    <span>${dept}</span>
+                    <span class="badge bg-primary rounded-pill">${count}</span>
+                </div>
+            `).join('');
+            
+            const otherCount = students.length - sortedDepartments.reduce((sum, [_, count]) => sum + count, 0);
+            if (otherCount > 0) {
+                distributionDiv.innerHTML += `
+                    <div class="list-group-item d-flex justify-content-between align-items-center">
+                        <span>Autres</span>
+                        <span class="badge bg-primary rounded-pill">${otherCount}</span>
+                    </div>
+                `;
+            }
+        }
+
+        // Initialisation
+        document.addEventListener('DOMContentLoaded', () => {
+            renderStudents();
+            updateStats();
+        });
+    </script>
+</body>
+</html>

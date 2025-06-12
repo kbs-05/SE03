@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Enregistrement des étudiants</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        .form-control:focus, .form-select:focus {
+            box-shadow: 0 0 0 0.25rem rgba(79, 70, 229, 0.25);
+            border-color: #4F46E5;
+        }
+        
+        .btn-primary {
+            background-color: #4F46E5;
+            border-color: #4F46E5;
+        }
+        
+        .btn-primary:hover {
+            background-color: #4338CA;
+            border-color: #4338CA;
+        }
+        
+        .btn-success {
+            background-color: #10B981;
+            border-color: #10B981;
+        }
+        
+        .card {
+            transition: all 0.3s ease;
+            border: none;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        body {
+            background-color: #f8f9fa;
+        }
+        
+        #qrcode {
+            margin: 20px auto;
+            max-width: 200px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <header class="text-center mb-5">
+            <h1 class="display-4 fw-bold text-primary mb-3">Enregistrement des Étudiants</h1>
+            <p class="lead text-muted">Formulaire d'enregistrement des étudiants</p>
+            <a class="btn btn-success mt-3">
+                <i class="fas fa-list me-2"></i> Voir la liste des étudiants
+            </a>
+        </header>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <div class="card">
+                    <div class="card-body p-4">
+                        <h2 class="card-title h4 mb-4 pb-2 border-bottom">Formulaire d'enregistrement</h2>
+                        <form id="studentForm" (ngSubmit)="onSubmit()">
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="lastName" class="form-label">Nom*</label>
+                                    <input type="text" class="form-control" id="lastName" [(ngModel)]="student.lastName" name="lastName" required>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="firstName" class="form-label">Prénom*</label>
+                                    <input type="text" class="form-control" id="firstName" [(ngModel)]="student.firstName" name="firstName" required>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="matricule" class="form-label">Numéro de matricule*</label>
+                                <input type="text" class="form-control" id="matricule" [(ngModel)]="student.matricule" name="matricule" required>
+                            </div>
+                            
+                            <div class="row g-3 mb-3">
+                                <div class="col-md-6">
+                                    <label for="department" class="form-label">Composante*</label>
+                                    <select class="form-select" id="department" [(ngModel)]="student.department" name="department" required>
+                                        <option value="" disabled selected>Sélectionnez</option>
+                                        <option value="BUSINESS SCHOOL">BUSINESS SCHOOL</option>
+                                        <option value="ECOLE D'INGENIEUR DE LIBREVILLE">ECOLE D'INGENIEUR DE LIBREVILLE</option>
+                                        <option value="ECOLE DE SANTE DE LIBREVILLE">ECOLE DE SANTE DE LIBREVILLE</option>
+                                        <option value="INSTITUT D'ETUDES JURIDIQUES ET SCIENCE POLITIQUE">INSTITUT D'ETUDES JURIDIQUES ET SCIENCE POLITIQUE</option>
+                                        <option value="INSTITUT PHILIPPE MAURY DE L'AUDIOVISUEL ET DU CINEMA">INSTITUT PHILIPPE MAURY DE L'AUDIOVISUEL ET DU CINEMA</option>
+                                        <option value="INSTITUT D'AGRONOMIE ET DE SECURITE ALIMENTAIRE">INSTITUT D'AGRONOMIE ET DE SECURITE ALIMENTAIRE</option>
+                                        <option value="INSTITUT DE JOURNALISME ET DE COMMUNICATION DE LIBREVILLE">INSTITUT DE JOURNALISME ET DE COMMUNICATION DE LIBREVILLE</option>
+                                    </select>
+                                </div>
+                                <div class="col-md-6">
+                                    <label for="level" class="form-label">Niveau*</label>
+                                    <select class="form-select" id="level" [(ngModel)]="student.level" name="level" required>
+                                        <option value="" disabled selected>Sélectionnez</option>
+                                        <option value="L1">Licence 1</option>
+                                        <option value="L2">Licence 2</option>
+                                        <option value="L3">Licence 3</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label for="field" class="form-label">Majeure</label>
+                                <input type="text" class="form-control" id="field" [(ngModel)]="student.field" name="field">
+                            </div>
+                            
+                            <div class="pt-2">
+                                <button type="submit" class="btn btn-primary w-100 py-2">
+                                    <i class="fas fa-user-plus me-2"></i> Enregistrer l'étudiant
+                                </button>
+                            </div>
+                        </form>
+<div class="mt-4 text-center" *ngIf="qrCodeUrl">
+  <qrcode [qrdata]="qrCodeUrl" [width]="200" [errorCorrectionLevel]="'M'"></qrcode>
+  <p class="mt-2"><small>Scannez ce code pour afficher l'étudiant</small></p>
+</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- QRCode JS -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+</body>
+</html>
