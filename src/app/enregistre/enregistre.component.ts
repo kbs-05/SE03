@@ -23,7 +23,7 @@ export class ENREGISTREComponent {
   constructor(private firestore: Firestore, private router: Router) {}
 
   async onSubmit() {
-        const studentData = {
+    const studentData = {
       lastName: this.student.lastName,
       firstName: this.student.firstName,
       matricule: this.student.matricule,
@@ -46,16 +46,14 @@ export class ENREGISTREComponent {
 
       await setDoc(studentRef, studentData);
 
-// Encodage des données pour l'URL
+      // Encodage des données pour l'URL
       const encoded = btoa(JSON.stringify(studentData));
-      this.qrCodeUrl = `${window.location.origin}/affiche/${encoded}`;
-console.log(this.qrCodeUrl)
+      // Modification ici pour utiliser votre domaine Netlify
+      this.qrCodeUrl = `https://em-gabonscan.netlify.app/affiche/${encoded}`;
+      console.log(this.qrCodeUrl);
       
-// Redirection (si souhaitée immédiatement après)
-      // this.router.navigate(['/affiche', encoded]);
-
     } catch (error) {
-      console.error('Erreur lors de l’enregistrement de l’étudiant :', error);
-        }
+      console.error('Erreur lors de l’enregistrement de l’étudiant :', error)
+    }
   }
 }
