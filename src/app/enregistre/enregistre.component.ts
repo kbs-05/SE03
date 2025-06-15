@@ -49,7 +49,7 @@ export class ENREGISTREComponent {
       // Encodage des données pour l'URL
       const encoded = btoa(JSON.stringify(studentData));
       // Modification ici pour utiliser votre domaine Netlify
-      this.qrCodeUrl = `https://em-gabonscan.netlify.app/affiche/${encoded}`;
+      this.qrCodeUrl = `https://se-03-kbs1.vercel.app/affiche/${encoded}`;
       console.log(this.qrCodeUrl);
       
     } catch (error) {
