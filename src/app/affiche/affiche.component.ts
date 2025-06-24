@@ -79,7 +79,14 @@ async markAllAbsent() {
         batchUpdates.push(updateDoc(studentRef, {
           status: 'Absent',
           heure: '2h',
+          lastUpdated: new Date()
         }));
+
+        // Si c’est l’étudiant en cours, on met à jour l’UI aussi
+        if (studentDoc.id === `${this.studentData.lastName}_${this.studentData.firstName}`) {
+          this.studentData.status = 'Absent';
+          this.status = 'Absent';
+        }
       }
     });
 
@@ -89,5 +96,4 @@ async markAllAbsent() {
     console.error('Erreur lors du marquage des absents :', error);
   }
 }
-
 }
