@@ -1,176 +1,128 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Liste des étudiants</title>
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        :root {
-            --primary: #4F46E5;
-            --secondary: #10B981;
-            --danger: #EF4444;
-            --warning: #F59E0B;
-        }
-        
-        .bg-primary {
-            background-color: var(--primary) !important;
-        }
-        
-        .bg-secondary {
-            background-color: var(--secondary) !important;
-        }
-        
-        .bg-danger {
-            background-color: var(--danger) !important;
-        }
-        
-        .bg-warning {
-            background-color: var(--warning) !important;
-        }
-        
-        .text-primary {
-            color: var(--primary) !important;
-        }
-        
-        .text-secondary {
-            color: var(--secondary) !important;
-        }
-        
-        .text-danger {
-            color: var(--danger) !important;
-        }
-        
-        .text-warning {
-            color: var(--warning) !important;
-        }
-        
-        .border-primary {
-            border-color: var(--primary) !important;
-        }
-        
-        .border-secondary {
-            border-color: var(--secondary) !important;
-        }
-        
-        .border-danger {
-            border-color: var(--danger) !important;
-        }
-        
-        .border-warning {
-            border-color: var(--warning) !important;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            border-color: var(--primary);
-        }
-        
-        .btn-primary:hover {
-            background-color: #4338CA;
-            border-color: #4338CA;
-        }
-        
-        .student-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .student-card {
-            transition: all 0.3s ease;
-        }
-        
-        .stat-card {
-            border-left: 4px solid;
-        }
-        
-        body {
-            background-color: #f8f9fa;
-        }
-        
-        .table-responsive {
-            overflow-x: auto;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Liste des étudiants</title>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    body {
+      background: linear-gradient(to right, #4f46e5, #3b82f6);
+      min-height: 100vh;
+      color: white;
+    }
+    .card {
+      border: none;
+      border-radius: 15px;
+      transition: transform 0.2s;
+    }
+    .card:hover {
+      transform: translateY(-5px);
+    }
+    .card-body {
+      background-color: rgba(255,255,255,0.9);
+      color: #333;
+      border-radius: 15px;
+    }
+    .section-title {
+      font-size: 1.5rem;
+      margin-bottom: 1rem;
+    }
+  </style>
 </head>
 <body>
-    <div class="container py-5">
-        <header class="text-center mb-5">
-            <h1 class="display-4 fw-bold text-primary mb-3">Liste des Étudiants</h1>
-        </header>
-            
-        <!-- Liste des étudiants -->
-        <div class="card">
-            <div class="card-body">
-                <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center mb-4">
-                    <h2 class="h4 card-title mb-3 mb-md-0">Liste des étudiants</h2>
-                </div>
-                
-                <div class="table-responsive">
-                    <table class="table table-hover">
-                        <thead class="table-light">
-                            <tr>
-                                <th>Matricule</th>
-                                <th>Nom & Prénom</th>
-                                <th>Département</th>
-                                <th>Niveau</th>
-                                <th>Filière</th>
-                                <th>Statut</th>
-                                <th>Heures d'absence</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="studentTableBody">
-                            <tr>
-                                <td colspan="8" class="text-center py-4 text-muted">Chargement des données...</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-                
-                <div id="pagination" class="d-flex justify-content-between align-items-center mt-3">
-                    <div class="text-muted small">
-                        Affichage de <span id="startItem">0</span> à <span id="endItem">0</span> sur <span id="totalItems">0</span> étudiants
-                    </div>
-                    <div class="btn-group">
-                        <button id="prevPage" class="btn btn-outline-primary btn-sm" disabled>
-                            <i class="fas fa-chevron-left"></i>
-                        </button>
-                        <button id="nextPage" class="btn btn-outline-primary btn-sm" disabled>
-                            <i class="fas fa-chevron-right"></i>
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<div class="container py-5">
+  <h1 class="text-center mb-4">Explorateur Firebase</h1>
 
-    <!-- Modal pour modifier les heures d'absence -->
-    <div class="modal fade" id="absenceModal" tabindex="-1" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Modifier les heures d'absence</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="absenceHours" class="form-label">Heures d'absence</label>
-                        <input type="number" class="form-control" id="absenceHours" min="0">
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <button type="button" id="saveAbsence" class="btn btn-primary">Enregistrer</button>
-                </div>
-            </div>
+  <!-- Étape 1: Departments -->
+  <div *ngIf="!selectedDepartment">
+    <h2 class="section-title">Composantes (Departments)</h2>
+    <div class="row">
+      <div class="col-md-4 mb-4" *ngFor="let dept of departments" (click)="selectDepartment(dept)">
+        <div class="card h-100 text-center">
+          <div class="card-body">
+            <h5 class="card-title">{{ dept }}</h5>
+            <p class="card-text">Voir les niveaux</p>
+          </div>
         </div>
+      </div>
     </div>
+  </div>
 
-    <!-- Bootstrap JS Bundle with Popper -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <!-- Étape 2: Levels -->
+  <div *ngIf="selectedDepartment && !selectedLevel">
+    <button class="btn btn-light mb-3" (click)="resetToDepartments()">← Retour</button>
+    <h2 class="section-title">Niveaux de {{ selectedDepartment }}</h2>
+    <div class="row">
+      <div class="col-md-4 mb-4" *ngFor="let level of levels" (click)="selectLevel(level)">
+        <div class="card h-100 text-center">
+          <div class="card-body">
+            <h5 class="card-title">{{ level }}</h5>
+            <p class="card-text">Voir les filières</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Étape 3: Fields -->
+  <div *ngIf="selectedLevel && !selectedField">
+    <button class="btn btn-light mb-3" (click)="resetToLevels()">← Retour</button>
+    <h2 class="section-title">Filières dans {{ selectedLevel }}</h2>
+    <div class="row">
+      <div class="col-md-4 mb-4" *ngFor="let field of fields" (click)="selectField(field)">
+        <div class="card h-100 text-center">
+          <div class="card-body">
+            <h5 class="card-title">{{ field }}</h5>
+            <p class="card-text">Voir les étudiants</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Étape 4: Étudiants -->
+  <div *ngIf="selectedField">
+    <button class="btn btn-light mb-3" (click)="resetToFields()">← Retour</button>
+    <h2 class="section-title">Étudiants en {{ selectedField }}</h2>
+    <div class="row">
+      <div class="col-md-4 mb-4" *ngFor="let student of students">
+        <div class="card h-100 text-center" (click)="openModal(student)">
+          <div class="card-body">
+            <h5 class="card-title">{{ student.lastName }} {{ student.firstName }}</h5>
+            <p class="card-text">Matricule : {{ student.matricule }}</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal Étudiant -->
+  <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="studentModalLabel">Détails de l'étudiant</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+        </div>
+        <div class="modal-body">
+          <p><strong>Nom :</strong> {{ selectedStudent?.lastName }}</p>
+          <p><strong>Prénom :</strong> {{ selectedStudent?.firstName }}</p>
+          <p><strong>Matricule :</strong> {{ selectedStudent?.matricule }}</p>
+          <p><strong>Status :</strong> {{ selectedStudent?.status || 'Non défini' }}</p>
+          <p><strong>Heure :</strong> {{ selectedStudent?.heure || '-' }}</p>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
