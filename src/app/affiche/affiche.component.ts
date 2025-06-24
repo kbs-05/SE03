@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { Firestore, collection, doc, setDoc } from '@angular/fire/firestore';
+import { Firestore, collection, doc, getDocs, setDoc, updateDoc } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-affiche',
@@ -32,20 +32,62 @@ export class AFFICHEComponent implements OnInit {
   }
 
   async markPresence(status: string) {
-    try {
-      const presenceRef = doc(
-        collection(this.firestore, 'Presences'),
-        `${this.studentData.matricule}_${new Date().toISOString()}`
-      );
-      await setDoc(presenceRef, {
-        student: this.studentData,
-        status: status,
-        timestamp: new Date()
-      });
-      this.status = status;
-      alert(`Statut marqué : ${status}`);
-    } catch (error) {
-      console.error('Error marking presence:', error);
-    }
+  try {
+    const studentRef = doc(
+      collection(
+        doc(
+          collection(this.firestore, this.studentData.department),
+          this.studentData.level
+        ),
+        this.studentData.field || 'General'
+      ),
+      `${this.studentData.lastName}_${this.studentData.firstName}`
+    );
+
+    await updateDoc(studentRef, {
+      status: status,
+    });
+
+    this.status = status;
+    alert(`Statut marqué : ${status}`);
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour du statut :', error);
   }
+}
+
+async markAllAbsent() {
+  try {
+    const studentsCollectionRef = collection(
+      doc(
+        collection(this.firestore, this.studentData.department),
+        this.studentData.level
+      ),
+      this.studentData.field || 'General'
+    );
+
+    const snapshot = await getDocs(studentsCollectionRef);
+
+    const batchUpdates: Promise<void>[] = [];
+
+    snapshot.forEach((studentDoc) => {
+      const data = studentDoc.data() as any;
+
+      // Marquer absent si non déjà présent
+      if (!data.status || data.status !== 'Présent') {
+        const studentRef = doc(studentsCollectionRef, studentDoc.id);
+
+        batchUpdates.push(updateDoc(studentRef, {
+          status: 'Absent',
+          heure: '2h',
+        }));
+      }
+    });
+
+    await Promise.all(batchUpdates);
+    alert('Tous les absents ont été marqués avec 2h d’absence.');
+  } catch (error) {
+    console.error('Erreur lors du marquage des absents :', error);
+  }
+}
+
 }
