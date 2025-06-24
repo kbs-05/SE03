@@ -134,19 +134,29 @@
             </div>
           </div>
 
-          <div class="d-flex justify-content-center gap-3">
-            <button (click)="markPresence('Présent')" 
-                    class="btn btn-success btn-presence">
-              <i class="bi bi-check-circle me-2"></i>Présent
-            </button>
-            <div>
-              NB: Cliquez sur Compléter après avoir marquer la présence du dernier étudiant présent. 
-            </div>
-            <button (click)="markPresence('Absent')" 
-                    class="btn btn-danger btn-presence">
-              <i class="bi bi-x-circle me-2"></i>Liste de Présence compléter
-            </button>
-          </div>
+          <div class="text-center">
+  <!-- Bouton Présent en haut -->
+  <div class="mb-3">
+    <button (click)="markPresence('Présent')" 
+            class="btn btn-success btn-presence">
+      <i class="bi bi-check-circle me-2"></i>Présent
+    </button>
+  </div>
+
+  <!-- Message au milieu -->
+  <div class="mb-3 text-white fw-semibold">
+    NB : Cliquez sur "Compléter" après avoir marqué la présence du dernier étudiant présent.
+  </div>
+
+  <!-- Bouton Liste de présence compléter en bas -->
+  <div>
+    <button (click)="markPresence('Absent')" 
+            class="btn btn-danger btn-presence">
+      <i class="bi bi-x-circle me-2"></i>Liste de Présence Compléter
+    </button>
+  </div>
+</div>
+
         </div>
       </div>
     </div>
