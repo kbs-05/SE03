@@ -31,15 +31,36 @@
       font-size: 1.5rem;
       margin-bottom: 1rem;
     }
+    .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background: linear-gradient(135deg, #0a58ca 0%, #003366 100%);
+            z-index: 1000;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
   </style>
 </head>
 <body>
+  <nav class="navbar navbar-expand-lg navbar-dark">
+            <div class="container-fluid">
+                
+                <a class="navbar-brand" routerLink="/">
+                  <img src="assets/U.jpg" alt="Logo EM GABON" style="max-height: 40px;"> 
+  <span class="d-none d-sm-inline">EM GABON</span> 
+</a>
+               
+            </div>
+        </nav>
+        <br>
 <div class="container py-5">
-  <h1 class="text-center mb-4">Explorateur Firebase</h1>
+  <h1 class="text-center mb-4">Composantes (Departements)</h1>
 
   <!-- Étape 1: Departments -->
   <div *ngIf="!selectedDepartment">
-    <h2 class="section-title">Composantes (Departments)</h2>
+    <h2 class="section-title"></h2>
     <div class="row">
       <div class="col-md-4 mb-4" *ngFor="let dept of departments" (click)="selectDepartment(dept)">
         <div class="card h-100 text-center">
