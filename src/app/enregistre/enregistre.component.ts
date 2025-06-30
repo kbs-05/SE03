@@ -35,7 +35,15 @@ export class ENREGISTREComponent {
     };
 
     try {
-      // 🔹 1. Enregistrement de l'étudiant
+      const encoded = btoa(JSON.stringify(studentData));
+      this.qrCodeUrl = `https://se-03-kbs1.vercel.app/affiche/${encoded}`;
+
+      // 🔹 Ajout du QR Code dans les données
+      const studentDocData = {
+        ...studentData,
+        qrCodeUrl: this.qrCodeUrl
+      };
+
       const studentRef = doc(
         this.firestore,
         'departements',
@@ -48,9 +56,8 @@ export class ENREGISTREComponent {
         `${this.student.lastName}_${this.student.firstName}`
       );
 
-      await setDoc(studentRef, studentData);
+      await setDoc(studentRef, studentDocData);
 
-      // 🔹 2. S'assurer que les documents parents ne sont pas vides
       const departementRef = doc(this.firestore, 'departements', this.student.department);
       await setDoc(departementRef, { nom: this.student.department }, { merge: true });
 
@@ -60,16 +67,22 @@ export class ENREGISTREComponent {
       const filiereRef = doc(this.firestore, 'departements', this.student.department, 'niveaux', this.student.level, 'filieres', this.student.field || 'General');
       await setDoc(filiereRef, { nom: this.student.field || 'General' }, { merge: true });
 
-      // 🔹 3. Génération du lien QR Code
-      const encoded = btoa(JSON.stringify(studentData));
-      this.qrCodeUrl = `https://se-03-kbs1.vercel.app/affiche/${encoded}`;
-
       console.log("✅ Étudiant enregistré avec succès !");
       console.log("QR Code :", this.qrCodeUrl);
     } catch (error) {
       console.error('❌ Erreur lors de l’enregistrement de l’étudiant :', error);
     } finally {
       this.isLoading = false;
+    }
+  }
+
+  downloadQrCode() {
+    const canvas = document.querySelector('qrcode canvas') as HTMLCanvasElement;
+    if (canvas) {
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL("image/png");
+      link.download = `${this.student.lastName}_${this.student.firstName}_qr.png`;
+      link.click();
     }
   }
 }
