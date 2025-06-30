@@ -1,98 +1,116 @@
 import { Component, OnInit } from '@angular/core';
-import { Firestore, collection, getDocs, doc } from '@angular/fire/firestore';
+import { Firestore, collection, getDocs } from '@angular/fire/firestore';
 
 @Component({
-  selector: 'app-liste',
+  selector: 'app-liste-etudiants',
   standalone: false,
   templateUrl: './liste.component.html',
-  styleUrl: './liste.component.css'
+  styleUrls: ['./liste.component.css']
 })
 export class LISTEComponent implements OnInit {
-  departments: string[] = [];
-  levels: string[] = [];
-  fields: string[] = [];
-  students: any[] = [];
+  departements: any[] = [];
+  niveaux: any[] = [];
+  filieres: any[] = [];
+  etudiants: any[] = [];
 
-  selectedDepartment: string | null = null;
-  selectedLevel: string | null = null;
-  selectedField: string | null = null;
-  selectedStudent: any = null;
+  selectedDepartement: string = '';
+  selectedNiveau: string = '';
+  selectedFiliere: string = '';
+
+  isLoading: boolean = false;
 
   constructor(private firestore: Firestore) {}
 
   async ngOnInit() {
-    try {
-      // Récupérer manuellement les noms des collections racines connues
-      this.departments = [
-        'BUSINESS SCHOOL',
-        "ECOLE D'INGENIEUR DE LIBREVILLE",
-        "ECOLE DE SANTE DE LIBREVILLE",
-        "INSTITUT D'ETUDES JURIDIQUES ET SCIENCE POLITIQUE",
-        "INSTITUT PHILIPPE MAURY DE L'AUDIOVISUEL ET DU CINEMA",
-        "INSTITUT D'AGRONOMIE ET DE SECURITE ALIMENTAIRE",
-        "INSTITUT DE JOURNALISME ET DE COMMUNICATION DE LIBREVILLE"
-      ];
-    } catch (error) {
-      console.error('Erreur lors de la récupération des composantes :', error);
-    }
+    this.isLoading = true;
+    await this.loadDepartements();
+    this.isLoading = false;
   }
 
-  async selectDepartment(dept: string) {
-    this.selectedDepartment = dept;
-    this.selectedLevel = null;
-    this.selectedField = null;
-    this.students = [];
-    try {
-      const levelsSnap = await getDocs(collection(this.firestore, dept));
-      this.levels = levelsSnap.docs.map(doc => doc.id);
-    } catch (error) {
-      console.error('Erreur lors de la récupération des niveaux :', error);
-    }
+  async loadDepartements() {
+    const departementRef = collection(this.firestore, 'departements');
+    const snapshot = await getDocs(departementRef);
+    this.departements = snapshot.docs.map(doc => ({ id: doc.id }));
+    console.log('Départements chargés :', this.departements);
   }
 
-  async selectLevel(level: string) {
-    this.selectedLevel = level;
-    this.selectedField = null;
-    this.students = [];
-    try {
-      const fieldsSnap = await getDocs(collection(this.firestore, `${this.selectedDepartment}/${level}`));
-      this.fields = fieldsSnap.docs.map(doc => doc.id);
-    } catch (error) {
-      console.error('Erreur lors de la récupération des filières :', error);
-    }
+  async selectDepartement(deptId: string) {
+    this.isLoading = true;
+    this.selectedDepartement = deptId;
+    this.niveaux = [];
+    this.filieres = [];
+    this.etudiants = [];
+    this.selectedNiveau = '';
+    this.selectedFiliere = '';
+
+    const niveauRef = collection(this.firestore, 'departements', deptId, 'niveaux');
+    const snapshot = await getDocs(niveauRef);
+    this.niveaux = snapshot.docs.map(doc => ({ id: doc.id }));
+    console.log(`Niveaux chargés pour ${deptId} :`, this.niveaux);
+    this.isLoading = false;
   }
 
-  async selectField(field: string) {
-    this.selectedField = field;
-    try {
-      const studentsSnap = await getDocs(collection(this.firestore, `${this.selectedDepartment}/${this.selectedLevel}/${this.selectedField}`));
-      this.students = studentsSnap.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-    } catch (error) {
-      console.error('Erreur lors de la récupération des étudiants :', error);
-    }
+  async selectNiveau(niveauId: string) {
+    this.isLoading = true;
+    this.selectedNiveau = niveauId;
+    this.filieres = [];
+    this.etudiants = [];
+    this.selectedFiliere = '';
+
+    const filiereRef = collection(
+      this.firestore,
+      'departements',
+      this.selectedDepartement,
+      'niveaux',
+      this.selectedNiveau,
+      'filieres'
+    );
+    const snapshot = await getDocs(filiereRef);
+    this.filieres = snapshot.docs.map(doc => ({ id: doc.id }));
+    console.log(`Filières chargées pour ${this.selectedNiveau} :`, this.filieres);
+    this.isLoading = false;
+  }
+
+  async selectFiliere(filiereId: string) {
+    this.isLoading = true;
+    this.selectedFiliere = filiereId;
+    this.etudiants = [];
+
+    const etudiantRef = collection(
+      this.firestore,
+      'departements',
+      this.selectedDepartement,
+      'niveaux',
+      this.selectedNiveau,
+      'filieres',
+      this.selectedFiliere,
+      'etudiants'
+    );
+    const snapshot = await getDocs(etudiantRef);
+    this.etudiants = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }))
+      .sort((a: any, b: any) => a.lastName.localeCompare(b.lastName));
+    console.log(`Étudiants chargés pour ${this.selectedFiliere} :`, this.etudiants);
+    this.isLoading = false;
   }
 
   resetToDepartments() {
-    this.selectedDepartment = null;
-    this.selectedLevel = null;
-    this.selectedField = null;
-    this.students = [];
+    this.selectedDepartement = '';
+    this.selectedNiveau = '';
+    this.selectedFiliere = '';
+    this.niveaux = [];
+    this.filieres = [];
+    this.etudiants = [];
   }
 
   resetToLevels() {
-    this.selectedLevel = null;
-    this.selectedField = null;
-    this.students = [];
+    this.selectedNiveau = '';
+    this.selectedFiliere = '';
+    this.filieres = [];
+    this.etudiants = [];
   }
 
   resetToFields() {
-    this.selectedField = null;
-    this.students = [];
-  }
-
-  openModal(student: any) {
-    this.selectedStudent = student;
-    const modal = new (window as any).bootstrap.Modal(document.getElementById('studentModal'));
-    modal.show();
+    this.selectedFiliere = '';
+    this.etudiants = [];
   }
 }

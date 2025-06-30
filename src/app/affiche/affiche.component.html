@@ -128,10 +128,16 @@
               <i class="bi bi-credit-card me-2"></i>
               Matricule: {{ studentData.matricule }}
             </div>
-            <div class="alert alert-info d-inline-block">
-              <i class="bi bi-info-circle me-2"></i>
-  Statut actuel: <strong>{{ status || studentData.status || 'Non défini' }}</strong>
-            </div>
+           <div class="alert alert-info d-inline-block">
+  <i class="bi bi-info-circle me-2"></i>
+  Statut actuel:
+  <strong>
+    <i *ngIf="(status || studentData.status) === 'Présent'" class="bi bi-check-circle-fill text-success me-1"></i>
+    <i *ngIf="(status || studentData.status) === 'Absent'" class="bi bi-x-circle-fill text-danger me-1"></i>
+    {{ status || studentData.status || 'Non défini' }}
+  </strong>
+</div>
+
           </div>
 
           <div class="text-center">

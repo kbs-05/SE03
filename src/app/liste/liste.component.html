@@ -1,23 +1,25 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Liste des étudiants</title>
   <!-- Bootstrap CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
   <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
   <style>
     body {
       background: linear-gradient(to right, #4f46e5, #3b82f6);
       min-height: 100vh;
       color: white;
+      padding-top: 70px;
     }
     .card {
       border: none;
       border-radius: 15px;
       transition: transform 0.2s;
+      cursor: pointer;
     }
     .card:hover {
       transform: translateY(-5px);
@@ -27,129 +29,122 @@
       color: #333;
       border-radius: 15px;
     }
-    .section-title {
-      font-size: 1.5rem;
-      margin-bottom: 1rem;
-    }
     .navbar {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            background: linear-gradient(135deg, #0a58ca 0%, #003366 100%);
-            z-index: 1000;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
-        }
-         .navbar-brand img {
-    max-height: 40px;
-    border-radius: 50%;
-    /* Pour un arrondi plus subtil : border-radius: 8px; */
-}
-
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      background: linear-gradient(135deg, #0a58ca 0%, #003366 100%);
+      z-index: 1000;
+      box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    }
+    .pointer-events-none {
+      pointer-events: none;
+      opacity: 0.5;
+    }
+    [position-absolute] {
+      z-index: 1050;
+    }
   </style>
 </head>
+
 <body>
   <nav class="navbar navbar-expand-lg navbar-dark">
-            <div class="container-fluid">
-                
-                <a class="navbar-brand" routerLink="/">
-                  <img src="assets/U.jpg" alt="Logo EM GABON" > 
-  <span class="d-none d-sm-inline">EM GABON</span> 
-</a>
-               
+    <div class="container-fluid">
+      <a class="navbar-brand" routerLink="/">
+        <img src="assets/U.jpg" alt="Logo EM GABON" style="max-height: 40px;" />
+        <span class="d-none d-sm-inline">EM GABON</span>
+      </a>
+    </div>
+  </nav>
+
+  <div class="container py-5">
+    <!-- Titre dynamique + bouton retour -->
+    <div class="d-flex align-items-center justify-content-center mb-4" style="gap: 1rem; position: relative;">
+      <button *ngIf="selectedDepartement || selectedNiveau || selectedFiliere" 
+              class="btn btn-light position-absolute start-0" 
+              (click)="
+                selectedFiliere ? resetToFields() : 
+                selectedNiveau ? resetToLevels() : 
+                resetToDepartments()">
+        ← Retour
+      </button>
+
+      <h1 class="text-center flex-grow-1 m-0">
+        {{ 
+          !selectedDepartement ? 'Composantes (Départements)' :
+          !selectedNiveau ? 'Niveaux de ' + selectedDepartement :
+          !selectedFiliere ? 'Filières dans ' + selectedNiveau :
+          'Étudiants en ' + selectedFiliere
+        }}
+      </h1>
+    </div>
+
+    <!-- Loader global centré en bas et en noir -->
+    <div *ngIf="isLoading" class="position-absolute bottom-0 start-50 translate-middle-x mb-5 text-center">
+      <div class="spinner-border text-dark" role="status">
+        <span class="visually-hidden">Chargement...</span>
+      </div>
+      <p class="mt-2 text-dark fw-bold">Chargement en cours...</p>
+    </div>
+
+    <!-- Étape 1: Départements -->
+    <div *ngIf="!selectedDepartement && !isLoading" [class.pointer-events-none]="isLoading">
+      <div class="row">
+        <div class="col-md-4 mb-4" *ngFor="let dept of departements" (click)="selectDepartement(dept.id)">
+          <div class="card h-100 text-center">
+            <div class="card-body">
+              <h5 class="card-title">{{ dept.id }}</h5>
+              <p class="card-text">Voir les niveaux</p>
             </div>
-        </nav>
-        <br>
-<div class="container py-5">
-  <h1 class="text-center mb-4">Composantes (Departements)</h1>
-
-  <!-- Étape 1: Departments -->
-  <div *ngIf="!selectedDepartment">
-    <h2 class="section-title"></h2>
-    <div class="row">
-      <div class="col-md-4 mb-4" *ngFor="let dept of departments" (click)="selectDepartment(dept)">
-        <div class="card h-100 text-center">
-          <div class="card-body">
-            <h5 class="card-title">{{ dept }}</h5>
-            <p class="card-text">Voir les niveaux</p>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Étape 2: Levels -->
-  <div *ngIf="selectedDepartment && !selectedLevel">
-    <button class="btn btn-light mb-3" (click)="resetToDepartments()">← Retour</button>
-    <h2 class="section-title">Niveaux de {{ selectedDepartment }}</h2>
-    <div class="row">
-      <div class="col-md-4 mb-4" *ngFor="let level of levels" (click)="selectLevel(level)">
-        <div class="card h-100 text-center">
-          <div class="card-body">
-            <h5 class="card-title">{{ level }}</h5>
-            <p class="card-text">Voir les filières</p>
+    <!-- Étape 2: Niveaux -->
+    <div *ngIf="selectedDepartement && !selectedNiveau && !isLoading" [class.pointer-events-none]="isLoading">
+      <div class="row">
+        <div class="col-md-4 mb-4" *ngFor="let niveau of niveaux" (click)="selectNiveau(niveau.id)">
+          <div class="card h-100 text-center">
+            <div class="card-body">
+              <h5 class="card-title">{{ niveau.id }}</h5>
+              <p class="card-text">Voir les filières</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Étape 3: Fields -->
-  <div *ngIf="selectedLevel && !selectedField">
-    <button class="btn btn-light mb-3" (click)="resetToLevels()">← Retour</button>
-    <h2 class="section-title">Filières dans {{ selectedLevel }}</h2>
-    <div class="row">
-      <div class="col-md-4 mb-4" *ngFor="let field of fields" (click)="selectField(field)">
-        <div class="card h-100 text-center">
-          <div class="card-body">
-            <h5 class="card-title">{{ field }}</h5>
-            <p class="card-text">Voir les étudiants</p>
+    <!-- Étape 3: Filières -->
+    <div *ngIf="selectedNiveau && !selectedFiliere && !isLoading" [class.pointer-events-none]="isLoading">
+      <div class="row">
+        <div class="col-md-4 mb-4" *ngFor="let filiere of filieres" (click)="selectFiliere(filiere.id)">
+          <div class="card h-100 text-center">
+            <div class="card-body">
+              <h5 class="card-title">{{ filiere.id }}</h5>
+              <p class="card-text">Voir les étudiants</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
 
-  <!-- Étape 4: Étudiants -->
-  <div *ngIf="selectedField">
-    <button class="btn btn-light mb-3" (click)="resetToFields()">← Retour</button>
-    <h2 class="section-title">Étudiants en {{ selectedField }}</h2>
-    <div class="row">
-      <div class="col-md-4 mb-4" *ngFor="let student of students">
-        <div class="card h-100 text-center" (click)="openModal(student)">
-          <div class="card-body">
-            <h5 class="card-title">{{ student.lastName }} {{ student.firstName }}</h5>
-            <p class="card-text">Matricule : {{ student.matricule }}</p>
-          </div>
-        </div>
-      </div>
+    <!-- Étape 4: Étudiants sous forme de liste alphabétique -->
+    <div *ngIf="selectedFiliere && !isLoading" [class.pointer-events-none]="isLoading">
+      <ul class="list-group list-group-flush">
+        <li *ngFor="let student of etudiants" 
+            class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+            style="cursor: default;">
+          <span>
+            <strong>{{ student.lastName }}</strong> {{ student.firstName }}
+          </span>
+          <span class="badge bg-primary rounded-pill">Matricule: {{ student.matricule }}</span>
+        </li>
+      </ul>
     </div>
   </div>
 
-  <!-- Modal Étudiant -->
-  <div class="modal fade" id="studentModal" tabindex="-1" aria-labelledby="studentModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="studentModalLabel">Détails de l'étudiant</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <p><strong>Nom :</strong> {{ selectedStudent?.lastName }}</p>
-          <p><strong>Prénom :</strong> {{ selectedStudent?.firstName }}</p>
-          <p><strong>Matricule :</strong> {{ selectedStudent?.matricule }}</p>
-          <p><strong>Status :</strong> {{ selectedStudent?.status || 'Non défini' }}</p>
-          <p><strong>Heure :</strong> {{ selectedStudent?.heure || '-' }}</p>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-</div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
