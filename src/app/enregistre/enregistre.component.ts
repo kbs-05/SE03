@@ -36,7 +36,7 @@ export class ENREGISTREComponent {
 
     try {
       const encoded = btoa(JSON.stringify(studentData));
-      this.qrCodeUrl = `https://se-03-kbs1.vercel.app/affiche/${encoded}`;
+      this.qrCodeUrl = `https://se-03.vercel.app//affiche/${encoded}`;
 
       // 🔹 Ajout du QR Code dans les données
       const studentDocData = {
